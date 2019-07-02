@@ -1,0 +1,16 @@
+# MacOS
+.DS_Store
+
+#TODO list
+TODO.txt
+
+# Output files
+logs/*
+models/*
+imgs/*
+
+# Compiled Python
+__pycache__/
+
+# Scripts
+scripts/scripts.sh
