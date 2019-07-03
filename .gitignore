@@ -1,9 +1,6 @@
 # MacOS
 .DS_Store
 
-#TODO list
-TODO.txt
-
 # Output files
 logs/*
 models/*

@@ -1,5 +1,4 @@
 import os
-from time import time
 import numpy as np
 from RLAgents.core import Agent
 
@@ -82,9 +81,9 @@ class ValueIterationAgent(Agent):
     def load_brain(self, models):
         self.V = np.load('models/VI/' + models[0] + '.npy')
 
-    def save_brain(self, tic):
+    def save_brain(self, timestamp):
         os.makedirs('models/VI', exist_ok = True)
-        np.save('models/VI/V{}.npy'.format(time()), self.V)
+        np.save('models/VI/V{}.npy'.format(timestamp), self.V)
 
     def control(self, observation):
         '''

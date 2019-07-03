@@ -1,4 +1,4 @@
-from time import time
+import os
 import numpy as np
 from RLAgents.core import Agent
 from utils.utils import Epsilon_Greedy
@@ -16,7 +16,10 @@ class QLearningAgent(Agent):
         self.learning_rate = lr
 
         # Initialize the agent
-        self.Q = np.random.normal(0, 1, size = (self.state_dim, self.action_dim)) # Action values        
+        try:
+            self.load_brain(models)
+        except:
+            self.Q = np.random.normal(0, 1, size = (self.state_dim, self.action_dim)) # Action values        
     
     def learn(self, max_epoch, eval = False, logger = None, plot = False):
         '''
@@ -47,14 +50,12 @@ class QLearningAgent(Agent):
             if eval:
                 _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
 
-                if plot:
-                    pass
-
     def load_brain(self, models):
         self.Q = np.load('models/QL/' + models[0] + '.npy')
 
-    def save_brain(self):
-        np.save('models/QL/Q{}.npy'.format(time()), self.Q)
+    def save_brain(self, timestamp):
+        os.makedirs('models/QL', exist_ok = True)
+        np.save('models/QL/Q{}.npy'.format(timestamp), self.Q)
 
     def control(self, observation):
         '''
@@ -62,5 +63,4 @@ class QLearningAgent(Agent):
             Control method
         '''
         
-        action = np.amax(self.Q[observation])
-        return action
+        return np.amax(self.Q[observation])

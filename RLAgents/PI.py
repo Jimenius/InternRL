@@ -1,7 +1,6 @@
 import os
 import numpy as np
 from RLAgents.core import Agent
-from utils.utils import plot_learn
 
 class PolicyIterationAgent(Agent):
     '''
@@ -101,10 +100,10 @@ class PolicyIterationAgent(Agent):
         self.policy = np.load('models/PI/' + models[0] + '.npy')
         self.V = np.load('models/PI/' + models[1] + '.npy')
 
-    def save_brain(self, tic):
+    def save_brain(self, timestamp):
         os.makedirs('models/PI', exist_ok = True)
-        np.save('models/PI/Policy{}.npy'.format(tic), self.policy)
-        np.save('models/PI/V{}.npy'.format(tic), self.V)
+        np.save('models/PI/Policy{}.npy'.format(timestamp), self.policy)
+        np.save('models/PI/V{}.npy'.format(timestamp), self.V)
 
     def control(self, observation):
         '''
