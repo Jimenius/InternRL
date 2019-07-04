@@ -13,6 +13,7 @@ from utils.log import Logger
 if __name__ == '__main__':
 
     tic = int(time()) # Identify the program process by the timestamp
+    print('Program timestamp: {}'.format(tic))
 
     opt = ParseArguments()
     env = gym.make(opt.ENV)
@@ -25,14 +26,17 @@ if __name__ == '__main__':
     if agent_name == 'POLICYITERATION':
         agent = RLAgents.PI.PolicyIterationAgent(env = env, theta = opt.THETA, gamma = opt.GAMMA)
         learn_logger = Logger('MainLearn', logdir = logdir, logfile = 'PILearn{}.log'.format(tic))
+        print('Start learning...')
         agent.learn(max_epoch = opt.MAX_EPOCH, eval = opt.EVAL, logger = learn_logger)
         toc = int(time())
         print('Learning takes {}s'.format(toc - tic))
         eval_logger = Logger('MainEval', logdir = logdir, logfile = 'PIEval{}.log'.format(tic))
+        print('Start evaluation...')
         _ = agent.render(num_episode = opt.NUM_EPISODE, vis = opt.VIS, intv = opt.INTERVAL, logger = eval_logger)
         if opt.MEMORIZE:
+            print('Saving learned models...')
             agent.save_brain(tic)
         if opt.LOGDIR and opt.EVAL and opt.PLOT: # Plot can only be drawn when learning is evaluated and logged.
+            print('Plot episodic reward of learning process...')
             plot_learn(logdir + 'PILearn{}.log'.format(tic))
-    toc = int(time())
     print('Program takes {}s'.format(toc - tic))

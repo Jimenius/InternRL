@@ -46,7 +46,7 @@ class ValueIterationAgent(Agent):
         
         return self.policy
 
-    def learn(self, max_epoch = 1000):
+    def learn(self, max_epoch = 1000, eval = False, logger = None):
         '''
         Description:
             Training method
@@ -74,6 +74,9 @@ class ValueIterationAgent(Agent):
                 delta = max(delta, abs(oldV - newV))
             if delta < self.theta:
                 break
+            
+            if eval:
+                _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
             
         _ = self._extract_policy()
         return self.V
