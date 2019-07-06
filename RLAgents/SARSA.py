@@ -11,7 +11,7 @@ class SARSAAgent(Agent):
 
     def __init__(self, epsilon = 0.1, lr = 1e-2, models = None, **kwargs):
         super(SARSAAgent, self).__init__(**kwargs)
-        self.epsilon = None
+        self.epsilon = epsilon
         self.learning_rate = lr
 
         try:
@@ -63,4 +63,4 @@ class SARSAAgent(Agent):
             Control method
         '''
         
-        return np.amax(self.Q[observation])
+        return np.argmax(self.Q[observation])

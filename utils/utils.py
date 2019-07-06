@@ -18,9 +18,7 @@ def Epsilon_Greedy(value, e = 0.1):
     int
         Action index
     '''
-    assert type(value) in ('list', 'tuple')
-    assert len(value) == 1
-    assert type(e) == 'float'
+    assert len(value.shape) == 1
     assert 0 <= e <= 1
 
     nA = value.shape[0] # Number of actions
