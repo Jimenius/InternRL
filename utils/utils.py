@@ -62,8 +62,6 @@ def ParseArguments():
     parser.add_argument('--PLOT', action = 'store_true', help = 'Plot after learning evaluation')
 
     opt = parser.parse_args()
-    print('Argument configurations:')
-    print(opt)
     
     return opt
 
