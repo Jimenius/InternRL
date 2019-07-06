@@ -34,14 +34,13 @@ if __name__ == '__main__':
         agent.learn(max_epoch = opt.MAX_EPOCH, eval = opt.EVAL, logger = learn_logger)
         toc = int(time())
         main_logger('Learning takes {}s'.format(toc - tic))
-        eval_logger = Logger('MainEval', logdir = logdir, logfile = 'PIEval{}.log'.format(tic))
         main_logger('Start evaluation...')
-        _ = agent.render(num_episode = opt.NUM_EPISODE, vis = opt.VIS, intv = opt.INTERVAL, logger = eval_logger)
+        _ = agent.render(num_episode = opt.NUM_EPISODE, vis = opt.VIS, intv = opt.INTERVAL, logger = main_logger)
         if opt.MEMORIZE:
             main_logger('Saving learned models...')
             agent.save_brain(tic)
         if opt.LOGDIR and opt.EVAL and opt.PLOT: # Plot can only be drawn when learning is evaluated and logged.
             main_logger('Plot episodic reward of learning process...')
             plot_learn(logdir + 'PILearn{}.log'.format(tic))
-            
+
     main_logger('Program takes {}s'.format(toc - tic))
