@@ -7,6 +7,9 @@ class QLearningAgent(Agent):
     '''
     Description:
         Q-Learning agent
+
+    Reference:
+        Richard S. Sutton and Andrew G. Barto, Reinforcement Learning An Introduction Second Edition, Chapter 6.5.
     '''
 
     def __init__(self, epsilon = 0.1, lr = 1e-2, **kwargs):
@@ -38,6 +41,7 @@ class QLearningAgent(Agent):
             Whether to plot a figure after training
         '''
 
+        # Exploring Starts, Reference Chapter 5.3
         isd = self.env.env.isd.copy()
         self.env.env.isd = np.ones(self.state_dim) / self.state_dim
 
@@ -53,7 +57,7 @@ class QLearningAgent(Agent):
             
             if eval:
                 _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
-                
+
         self.env.env.isd = isd
 
     def load_brain(self, models):

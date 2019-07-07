@@ -7,6 +7,9 @@ class SARSAAgent(Agent):
     '''
     Description:
         SARSA agent
+
+    Reference:
+        Richard S. Sutton and Andrew G. Barto, Reinforcement Learning An Introduction Second Edition, Chapter 6.4.
     '''
 
     def __init__(self, epsilon = 0.1, lr = 1e-2, models = None, **kwargs):
@@ -17,7 +20,8 @@ class SARSAAgent(Agent):
         try:
             self.load_brain(models)
         except:
-            self.Q = np.random.normal(0, 1, size = (self.state_dim, self.action_dim)) # Action values
+            self.Q = np.zeros((self.state_dim, self.action_dim))
+            #self.Q = np.random.normal(0, 1, size = (self.state_dim, self.action_dim)) # Action values
 
     def learn(self, max_epoch = 1000, eval = False, logger = None):
         '''
@@ -34,7 +38,11 @@ class SARSAAgent(Agent):
         plot: boolean
             Whether to plot a figure after training
         '''
-        
+
+        # Exploring Starts, Reference Chapter 5.3
+        isd = self.env.env.isd.copy()
+        self.env.env.isd = np.ones(self.state_dim) / self.state_dim
+
         for _ in range(max_epoch):
             state = self.env.reset()
             terminal = False
@@ -49,6 +57,8 @@ class SARSAAgent(Agent):
 
             if eval:
                 _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
+
+        self.env.env.isd = isd
 
     def load_brain(self, models):
         self.Q = np.load('models/SARSA/' + models[0] + '.npy')
