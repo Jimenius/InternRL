@@ -19,7 +19,8 @@ class QLearningAgent(Agent):
         try:
             self.load_brain(models)
         except:
-            self.Q = np.random.normal(0, 1, size = (self.state_dim, self.action_dim)) # Action values        
+            self.Q = np.zeros((self.state_dim, self.action_dim))
+            #self.Q = np.random.normal(0, 1, size = (self.state_dim, self.action_dim)) # Action values        
     
     def learn(self, max_epoch, eval = False, logger = None, plot = False):
         '''
@@ -36,7 +37,10 @@ class QLearningAgent(Agent):
         plot: boolean
             Whether to plot a figure after training
         '''
-        
+
+        isd = self.env.env.isd.copy()
+        self.env.env.isd = np.ones(self.state_dim) / self.state_dim
+
         for _ in range(max_epoch):
             state = self.env.reset()
             terminal = False
@@ -49,6 +53,8 @@ class QLearningAgent(Agent):
             
             if eval:
                 _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
+                
+        self.env.env.isd = isd
 
     def load_brain(self, models):
         self.Q = np.load('models/QL/' + models[0] + '.npy')
@@ -63,4 +69,4 @@ class QLearningAgent(Agent):
             Control method
         '''
         
-        return np.amax(self.Q[observation])
+        return np.argmax(self.Q[observation])
