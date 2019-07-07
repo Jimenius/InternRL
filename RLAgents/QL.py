@@ -41,11 +41,10 @@ class QLearningAgent(Agent):
             Whether to plot a figure after training
         '''
 
-        # Exploring Starts, Reference Chapter 5.3
-        isd = self.env.env.isd.copy()
-        self.env.env.isd = np.ones(self.state_dim) / self.state_dim
-
         for _ in range(max_epoch):
+            # Exploring Starts, Reference Chapter 5.3
+            isd = self.env.env.isd.copy()
+            self.env.env.isd = np.ones(self.state_dim) / self.state_dim
             state = self.env.reset()
             terminal = False
 
@@ -54,11 +53,10 @@ class QLearningAgent(Agent):
                 next_state, reward, terminal, _ = self.env.step(action)
                 self.Q[state][action] += self.learning_rate * (reward + self.gamma * np.amax(self.Q[next_state]) - self.Q[state][action])
                 state = next_state
-            
+
+            self.env.env.isd = isd
             if eval:
                 _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
-
-        self.env.env.isd = isd
 
     def load_brain(self, models):
         self.Q = np.load('models/QL/' + models[0] + '.npy')
