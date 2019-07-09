@@ -25,6 +25,10 @@ if __name__ == '__main__':
     main_logger(opt)
 
     env = gym.make(opt.ENV)
+    main_logger('Environment Description:')
+    main_logger('Environment type: {}'.format(env.class_name))
+    main_logger('Observation space: {}'.format(env.observation_space))
+    main_logger('Action space: {}'.format(env.action_space))
     agent_name = opt.AGENT.upper()
 
     if agent_name == 'POLICYITERATION':
