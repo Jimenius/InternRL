@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from argparse import ArgumentParser as AP
 
 def Epsilon_Greedy(value, e = 0.1):
     '''
@@ -27,41 +26,23 @@ def Epsilon_Greedy(value, e = 0.1):
     a = np.random.choice((exploit, explore), p = (1 - e, e)) # Choose between greedy and random
     return a
 
-def ParseArguments():
+def ParseConfig(cfg, default):
     '''
     Description:
-        Parse arguments from Shell scripts.
+        Complete user configurations in-place with default configurations.
     
-    Outputs:
-    argparse.Namespace
-        Arguments parsed from Shell scripts
+    Inputs:
+    cfg: dict
+        User configurations
+    default: dict
+        Default configurations
     '''
 
-    parser = AP()
-
-    # Core
-    parser.add_argument('--ENV', type = str, default = 'Taxi-v2', help = 'Gym environment')
-    parser.add_argument('--AGENT', type = str, default = 'QLearning', help = 'Reinforcement Learning Agent')
-    
-    # Parameters
-    parser.add_argument('--GAMMA', type = float, default = 1, help = 'Discount factor')
-    parser.add_argument('--MAX_EPOCH', type = int, default = 1000, help = 'Max Training epochs')
-    parser.add_argument('--NUM_EPISODE', type = int, default = 1, help = 'Evaluation episode')
-    parser.add_argument('--THETA', type = float, default = 1e-6, help = 'Convergence tolerance')
-    parser.add_argument('--LR', type = float, default = 1e-2, help = 'Learning rate')
-    parser.add_argument('--EPSILON', type = float, default = 0.1, help = 'Exploration rate')
-
-    # Evaluation
-    parser.add_argument('--VIS', action = 'store_true', help = 'Visualize evaluation')
-    parser.add_argument('--INTERVAL', type = float, default = 0, help = 'Time interval for render visualization')
-    parser.add_argument('--EVAL', action = 'store_true', help = 'Learning evaluation')
-    parser.add_argument('--MEMORIZE', action = 'store_true', help = 'Save models')
-    parser.add_argument('--LOGDIR', type = str, default = '', help = 'Gym environment')
-    parser.add_argument('--PLOT', action = 'store_true', help = 'Plot after learning evaluation')
-
-    opt = parser.parse_args()
-    
-    return opt
+    for k in default:
+        if isinstance(default[k], dict):
+            ParseConfig(cfg.setdefault(k, {}), default[k]) # Recursively set sub-dictionaries
+        else:
+            cfg.setdefault(k, default[k])
 
 def plot_learn(logfile):
     '''

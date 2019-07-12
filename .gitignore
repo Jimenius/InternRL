@@ -6,6 +6,9 @@ logs/*
 models/*
 imgs/*
 
+# Configuration files
+configs/*
+
 # Compiled Python
 __pycache__/
 
