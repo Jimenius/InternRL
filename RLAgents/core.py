@@ -8,8 +8,17 @@ class Agent(object):
 
     def __init__(self, env, gamma = 1):
         self.env = env
-        self.state_dim = self.env.observation_space.n # State dimension
-        self.action_dim = self.env.action_space.n # Action dimension
+        obs = env.observation_space
+        acs = env.action_space
+        if hasattr(obs, 'n'):
+            self.state_dim = obs.n
+        else:
+            self.state_dim = obs.shape
+
+        if hasattr(acs, 'n'):
+            self.action_dim = acs.n
+        else:
+            self.action_dim = acs.shape
 
         # Parameters
         self.gamma = gamma
