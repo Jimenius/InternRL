@@ -39,7 +39,7 @@ class PolicyIterationAgent(Agent):
             for state in range(self.state_dim):
                 oldV = self.V[state]
                 newV = 0
-                transition = self.env.env.P[state][self.policy[state]]
+                transition = self.model.P[state][self.policy[state]]
                 for trans_prob, next_state, reward, _ in transition:
                     newV += trans_prob * (reward + self.gamma * self.V[next_state])
                 self.V[state] = newV # Asynchronous update
@@ -61,7 +61,7 @@ class PolicyIterationAgent(Agent):
             oldP = self.policy[state]
             q = np.zeros(self.action_dim)
             for action in range(self.action_dim):
-                transition = self.env.env.P[state][action]
+                transition = self.model.P[state][action]
                 for trans_prob, next_state, reward, _ in transition:
                     q[action] += trans_prob * (reward + self.gamma * self.V[next_state])
                     

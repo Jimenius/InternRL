@@ -43,18 +43,18 @@ class QLearningAgent(Agent):
 
         for _ in range(max_epoch):
             # Exploring Starts, Reference Chapter 5.3
-            isd = self.env.env.isd.copy()
-            self.env.env.isd = np.ones(self.state_dim) / self.state_dim
-            state = self.env.reset()
+            isd = self.model.isd.copy()
+            self.model.isd = np.ones(self.state_dim) / self.state_dim
+            state = self.reset()
             terminal = False
 
             while not terminal:
                 action = Epsilon_Greedy(value = self.Q[state], e = self.epsilon)
-                next_state, reward, terminal, _ = self.env.step(action)
+                next_state, reward, terminal, _ = self.step(action)
                 self.Q[state][action] += self.learning_rate * (reward + self.gamma * np.amax(self.Q[next_state]) - self.Q[state][action])
                 state = next_state
 
-            self.env.env.isd = isd
+            self.model.isd = isd
             if eval:
                 _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
 

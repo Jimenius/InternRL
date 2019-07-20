@@ -35,7 +35,7 @@ class ValueIterationAgent(Agent):
             p = 0
             newV = float('-inf')
             for action in range(self.action_dim):
-                transition = self.env.env.P[state][action]
+                transition = self.model.P[state][action]
                 tv = 0
                 for trans_prob, next_state, reward, _ in transition:
                     tv += trans_prob * (reward + self.gamma * self.V[next_state])
@@ -61,7 +61,7 @@ class ValueIterationAgent(Agent):
                 oldV = self.V[state]
                 newV = float('-inf')
                 for action in range(self.action_dim):
-                    transition = self.env.env.P[state][action]
+                    transition = self.model.P[state][action]
                     v = 0
                     for trans_prob, next_state, reward, _ in transition:
                         v += trans_prob * (reward + self.gamma * self.V[next_state])

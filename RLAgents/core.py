@@ -8,6 +8,7 @@ class Agent(object):
 
     def __init__(self, env, gamma = 1):
         self.env = env
+        self.model = env.env
         obs = env.observation_space
         acs = env.action_space
         if hasattr(obs, 'n'):
@@ -22,6 +23,15 @@ class Agent(object):
 
         # Parameters
         self.gamma = gamma
+
+    def reset(self, *args, **kwargs):
+        return self.env.reset(*args, **kwargs)
+
+    def step(self, *args, **kwargs):
+        return self.env.step(*args, **kwargs)
+
+    def close(self, *args, **kwargs):
+        return self.env.close(*args, **kwargs)
 
     def learn(self):
         raise NotImplementedError # To be completed by subclasses
