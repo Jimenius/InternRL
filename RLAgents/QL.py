@@ -23,8 +23,7 @@ class QLearningAgent(Agent):
             self.load_brain(models)
         except:
             self.Q = np.zeros((self.state_dim, self.action_dim))
-            #self.Q = np.random.normal(0, 1, size = (self.state_dim, self.action_dim)) # Action values        
-    
+
     def learn(self, max_epoch, eval = False, logger = None, plot = False):
         '''
         Description:
@@ -45,6 +44,7 @@ class QLearningAgent(Agent):
             # Exploring Starts, Reference Chapter 5.3
             isd = self.model.isd.copy()
             self.model.isd = np.ones(self.state_dim) / self.state_dim
+
             state = self.reset()
             terminal = False
 
@@ -55,6 +55,8 @@ class QLearningAgent(Agent):
                 state = next_state
 
             self.model.isd = isd
+
+            # Evaluating current performance
             if eval:
                 _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
 

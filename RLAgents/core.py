@@ -8,7 +8,8 @@ class Agent(object):
 
     def __init__(self, env, gamma = 1):
         self.env = env
-        self.model = env.env
+        self.model = env.env # Internal environment model
+
         obs = env.observation_space
         acs = env.action_space
         if hasattr(obs, 'n'):
@@ -65,11 +66,11 @@ class Agent(object):
             Average cumulative rewards achieved in multiple episodes
         '''
         
-        avg_reward = 0
+        avg_reward = 0 # Average reward of episodes
         for episode in range(num_episode):
-            cumulative_reward = 0
+            cumulative_reward = 0 # Accumulate rewards of steps in an episode
             terminal = False
-            observation = self.env.reset()            
+            observation = self.env.reset()
             while not terminal:
                 if vis:
                     self.env.render()

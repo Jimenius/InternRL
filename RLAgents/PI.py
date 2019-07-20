@@ -21,7 +21,6 @@ class PolicyIterationAgent(Agent):
             self.load_brain(models)
         except:
             self.V = np.zeros(self.state_dim)
-            #self.V = np.random.normal(0, 1, size = self.state_dim) # State values
             self.policy = np.zeros(self.state_dim, dtype = np.int32) # Current policy
     
     def _PE(self):
@@ -92,8 +91,11 @@ class PolicyIterationAgent(Agent):
         while not stable and epoch < max_epoch:
             _ = self._PE() # Call Policy evaluation bound method
             stable = self._PI() # Call Policy Improvement bound method
+
+            # Evaluating current performance
             if eval:
                 _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
+
             epoch += 1
 
     def load_brain(self, models):

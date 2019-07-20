@@ -22,7 +22,6 @@ class ValueIterationAgent(Agent):
             self._extract_policy()
         except:
             self.V = np.zeros(self.state_dim)
-            #self.V = np.random.normal(0, 1, size = self.state_dim) # State values
             self.policy = np.zeros(self.state_dim, dtype = np.int32) # Current policy
 
     def _extract_policy(self):
@@ -73,8 +72,10 @@ class ValueIterationAgent(Agent):
                 delta = max(delta, abs(oldV - newV))
             if delta < self.theta:
                 break
-            
+
+            # Evaluating current performance
             if eval:
+                self._extract_policy()
                 _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
             
         self._extract_policy()
