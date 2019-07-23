@@ -8,7 +8,9 @@ class Agent(object):
 
     def __init__(self, env, gamma = 1):
         self.env = env
-        self.model = env.env # Internal environment model
+        self.model = env.env # Internal environment model alias
+        self.reset = self.env.reset # Reset environment alias
+        self.step = self.env.step # Step method alias
 
         obs = env.observation_space
         acs = env.action_space
@@ -21,18 +23,10 @@ class Agent(object):
             self.action_dim = acs.n
         else:
             self.action_dim = acs.shape
+            self.action_range = (acs.low, acs.high)
 
         # Parameters
         self.gamma = gamma
-
-    def reset(self, *args, **kwargs):
-        return self.env.reset(*args, **kwargs)
-
-    def step(self, *args, **kwargs):
-        return self.env.step(*args, **kwargs)
-
-    def close(self, *args, **kwargs):
-        return self.env.close(*args, **kwargs)
 
     def learn(self):
         raise NotImplementedError # To be completed by subclasses
