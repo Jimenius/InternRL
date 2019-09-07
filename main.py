@@ -6,8 +6,6 @@ import yaml
 
 import gym
 
-HOME = os.path.abspath('.')
-sys.path.append(HOME)
 import RLAgents
 from utils.utils import ParseConfig, plot_learn
 from utils.log import Logger
