@@ -98,9 +98,9 @@ class PolicyIterationAgent(Agent):
 
             epoch += 1
 
-    def load_brain(self, models):
-        self.policy = np.load('models/PI/' + models[0] + '.npy')
-        self.V = np.load('models/PI/' + models[1] + '.npy')
+    def load_brain(self, timestamp):
+        self.policy = np.load('models/PI/Policy{}.npy'.format(timestamp))
+        self.V = np.load('models/PI/V{}.npy'.format(timestamp))
 
     def save_brain(self, timestamp):
         os.makedirs('models/PI', exist_ok = True)

@@ -12,10 +12,13 @@ class QLearningAgent(Agent):
         Richard S. Sutton and Andrew G. Barto, Reinforcement Learning An Introduction Second Edition, Chapter 6.5.
     '''
 
-    def __init__(self, epsilon = 0.1, lr = 1e-2, **kwargs):
+    def __init__(self, epsilon = 1., epsilon_decay_type = 'Exponential', epsilon_decay = 0.99, epsilon_end = 0.01, lr = 1e-2, models = None, **kwargs):
         # Initialize parameters
         super(QLearningAgent, self).__init__(**kwargs)
         self.epsilon = epsilon
+        self.epsilon_decay_type = epsilon_decay_type.upper()
+        self.epsilon_decay = epsilon_decay
+        self.epsilon_end = epsilon_end
         self.learning_rate = lr
 
         # Initialize the agent
@@ -56,12 +59,21 @@ class QLearningAgent(Agent):
 
             self.model.isd = isd
 
+            # Exploration rate decay
+            if self.epsilon > self.epsilon_end:
+                if self.epsilon_decay_type == 'EXPONENTIAL':
+                    self.epsilon *= self.epsilon_decay
+                elif self.epsilon_decay_type == 'LINEAR':
+                    self.epsilon -= self.epsilon_decay
+                else:
+                    raise ValueError('Unsupported decay type.')
+
             # Evaluating current performance
             if eval:
                 _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
 
-    def load_brain(self, models):
-        self.Q = np.load('models/QL/' + models[0] + '.npy')
+    def load_brain(self, timestamp):
+        self.Q = np.load('models/QL/Q{}.npy'.format(timestamp))
 
     def save_brain(self, timestamp):
         os.makedirs('models/QL', exist_ok = True)

@@ -11,7 +11,7 @@ from utils.utils import ParseConfig, plot_learn
 from utils.log import Logger
 
 def main():
-    agent_set = set(('POLICYITERATION', 'VALUEITERATION', 'SARSA', 'QLEARNING'))
+
     tic = int(time()) # Identify the program process by the timestamp
     
     parser = AP()
@@ -32,12 +32,14 @@ def main():
     # Set configurations
     env_name = cfg['ENV']
     agent_name = cfg['AGENT'].upper()
+    brain = cfg['BRAIN']
     params = cfg['PARAMETERS']
     gamma = params['GAMMA']
     theta = float(params['THETA'])
     lr = float(params['LR'])
     eps_start = float(params['EPSILON_START'])
     eps_decay = float(params['EPSILON_DECAY'])
+    eps_type = params['EPSILON_DECAY_TYPE']
     eps_end = float(params['EPSILON_END'])
     max_epoch = int(float(params['MAX_EPOCH']))
     num_episode = int(float(params['NUM_EPISODE']))
@@ -63,37 +65,40 @@ def main():
     main_logger('Observation space: {}'.format(env.observation_space))
     main_logger('Action space: {}'.format(env.action_space))
 
-    if agent_name == 'POLICYITERATION':
-        agent = RLAgents.PI.PolicyIterationAgent(env = env, theta = theta, gamma = gamma)
+    if agent_name == 'RANDOM':
+        agent = RLAgents.core.RandomAgent(env = env)
+    elif agent_name == 'POLICYITERATION':
+        agent = RLAgents.PI.PolicyIterationAgent(env = env, theta = theta, models = brain, gamma = gamma)
         logfile = 'PILearn{}.log'.format(tic)
     elif agent_name == 'VALUEITERATION':
-        agent = RLAgents.VI.ValueIterationAgent(env = env, theta = theta, gamma = gamma)
+        agent = RLAgents.VI.ValueIterationAgent(env = env, theta = theta, models = brain, gamma = gamma)
         logfile = 'VILearn{}.log'.format(tic)
     elif agent_name == 'SARSA':
-        agent = RLAgents.SARSA.SARSAAgent(env = env, epsilon = eps_start, lr = lr, gamma = gamma)
+        agent = RLAgents.SARSA.SARSAAgent(env = env, epsilon = eps_start, epsilon_decay_type = eps_type, epsilon_decay = eps_decay, epsilon_end = eps_end, lr = lr, gamma = gamma)
         logfile = 'SARSALearn{}.log'.format(tic)
     elif agent_name == 'QLEARNING':
-        agent = RLAgents.QL.QLearningAgent(env = env, epsilon = eps_start, lr = lr, gamma = gamma)
+        agent = RLAgents.QL.QLearningAgent(env = env, epsilon = eps_start, epsilon_decay_type = eps_type, epsilon_decay = eps_decay, epsilon_end = eps_end, lr = lr, gamma = gamma)
         logfile = 'SARSALearn{}.log'.format(tic)
     else:
-        main_logger('The agent is not supported at this moment.')
+        raise ValueError('The agent is not supported at this moment.')
 
-    if agent_name in agent_set:
+    if max_epoch > 0:
         learn_logger = Logger('MainLearn', logdir = logdir, logfile = logfile)
         print('Start learning...')
         agent.learn(max_epoch = max_epoch, eval = eval_flag, logger = learn_logger)
         toc = int(time())
         main_logger('Learning takes {}s'.format(toc - tic))
-        print('Start evaluation...')
-        _ = agent.render(num_episode = num_episode, vis = vis, intv = intv, logger = main_logger)
-        if memorize:
-            print('Saving learned models...')
-            agent.save_brain(tic)
-            main_logger('The model is saved.')
-        if logdir and eval_flag and plot_flag: # Plot can only be drawn when learning is evaluated and logged.
-            main_logger('Plot episodic reward of learning process...')
-            plot_learn(logdir + logfile)
+    print('Start evaluation...')
+    _ = agent.render(num_episode = num_episode, vis = vis, intv = intv, logger = main_logger)
+    if memorize:
+        print('Saving learned models...')
+        agent.save_brain(tic)
+        main_logger('The model is saved.')
+    if logdir and eval_flag and plot_flag: # Plot can only be drawn when learning is evaluated and logged.
+        main_logger('Plot episodic reward of learning process...')
+        plot_learn(logdir + logfile)
 
+    toc = int(time())
     main_logger('Program takes {}s'.format(toc - tic))
 
 if __name__ == '__main__':

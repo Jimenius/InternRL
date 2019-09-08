@@ -80,8 +80,8 @@ class ValueIterationAgent(Agent):
             
         self._extract_policy()
 
-    def load_brain(self, models):
-        self.V = np.load('models/VI/' + models[0] + '.npy')
+    def load_brain(self, timestamp):
+        self.V = np.load('models/VI/V{}.npy'.format(timestamp))
 
     def save_brain(self, timestamp):
         os.makedirs('models/VI', exist_ok = True)

@@ -94,3 +94,29 @@ class Agent(object):
                 print(logtxt)
         self.env.close()
         return avg_reward
+
+class RandomAgent(Agent):
+    '''
+    Description:
+        Random agent as a baseline
+    '''
+
+    def learn(self, max_epoch = 0, eval = False, logger = None, plot = False):
+        '''
+        Description:
+            Training method
+        
+        Inputs:
+        max_epoch: int
+            Maximum learning epochs
+        eval: boolean
+            Whether to evaluate agent after a epoch of training
+        logger: Logger
+            Evaluation logger
+        plot: boolean
+            Whether to plot a figure after training
+        '''
+        print('Random agent does not need to learn.')
+    
+    def control(self, observation):
+        return self.env.action_space.sample()
