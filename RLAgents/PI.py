@@ -20,6 +20,7 @@ class PolicyIterationAgent(Agent):
         try:
             self.load_brain(models)
         except:
+            print('Failed to load pretrained models. Newly initialize the agent')
             self.V = np.zeros(self.state_dim)
             self.policy = np.zeros(self.state_dim, dtype = np.int32) # Current policy
     

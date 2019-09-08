@@ -21,6 +21,7 @@ class ValueIterationAgent(Agent):
             self.load_brain(models)
             self._extract_policy()
         except:
+            print('Failed to load pretrained models. Newly initialize the agent')
             self.V = np.zeros(self.state_dim)
             self.policy = np.zeros(self.state_dim, dtype = np.int32) # Current policy
 

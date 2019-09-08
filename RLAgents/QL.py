@@ -25,6 +25,7 @@ class QLearningAgent(Agent):
         try:
             self.load_brain(models)
         except:
+            print('Failed to load pretrained models. Newly initialize the agent')
             self.Q = np.zeros((self.state_dim, self.action_dim))
 
     def learn(self, max_epoch, eval = False, logger = None, plot = False):

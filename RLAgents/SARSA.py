@@ -23,6 +23,7 @@ class SARSAAgent(Agent):
         try:
             self.load_brain(models)
         except:
+            print('Failed to load pretrained models. Newly initialize the agent')
             self.Q = np.zeros((self.state_dim, self.action_dim))
 
     def learn(self, max_epoch = 1000, eval = False, logger = None):
