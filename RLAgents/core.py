@@ -6,7 +6,7 @@ class Agent(object):
         General agent super class
     '''
 
-    def __init__(self, env, gamma = 1):
+    def __init__(self, env, gamma = 1, brain = None):
         self.env = env
         self.model = env.env # Internal environment model alias
         self.reset = self.env.reset # Reset environment alias
@@ -27,6 +27,9 @@ class Agent(object):
 
         # Parameters
         self.gamma = gamma
+
+        # Trained model
+        self.brain = brain
 
     def learn(self):
         raise NotImplementedError # To be completed by subclasses
@@ -119,4 +122,9 @@ class RandomAgent(Agent):
         print('Random agent does not need to learn.')
     
     def control(self, observation):
+        '''
+        Description:
+            Control method
+        '''
+        
         return self.env.action_space.sample()

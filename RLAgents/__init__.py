@@ -1,2 +1,2 @@
-__all__ = ['core', 'PI', 'VI', 'SARSA', 'QL']
+__all__ = ['core', 'PI', 'VI', 'SARSA', 'QL', 'DQN']
 from . import *

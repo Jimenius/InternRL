@@ -34,15 +34,22 @@ def main():
     agent_name = cfg['AGENT'].upper()
     brain = cfg['BRAIN']
     params = cfg['PARAMETERS']
+    networks = cfg['NETWORKS']
+    backend = networks['BACKEND']
+    networks = networks['NETWORKS']
     gamma = params['GAMMA']
     theta = float(params['THETA'])
-    lr = float(params['LR'])
+    lr = float(params['LEARNING_RATE'])
     eps_start = float(params['EPSILON_START'])
     eps_decay = float(params['EPSILON_DECAY'])
     eps_type = params['EPSILON_DECAY_TYPE']
     eps_end = float(params['EPSILON_END'])
     max_epoch = int(float(params['MAX_EPOCH']))
+    max_step = int(float(params['MAX_STEP']))
     num_episode = int(float(params['NUM_EPISODE']))
+    capacity = int(float(params['MEMORY_CAPACITY']))
+    batch_size = int(float(params['BATCH_SIZE']))
+    update = int(params['TARGET_UPDATE'])
     funcs = cfg['FUNCTIONS']
     vis = funcs['VIS']
     intv = funcs['INTERVAL']
@@ -68,17 +75,22 @@ def main():
     if agent_name == 'RANDOM':
         agent = RLAgents.core.RandomAgent(env = env)
     elif agent_name == 'POLICYITERATION':
-        agent = RLAgents.PI.PolicyIterationAgent(env = env, theta = theta, models = brain, gamma = gamma)
+        agent = RLAgents.PI.PolicyIterationAgent(env = env, brain = brain, theta = theta, models = brain, gamma = gamma)
         logfile = 'PILearn{}.log'.format(tic)
     elif agent_name == 'VALUEITERATION':
-        agent = RLAgents.VI.ValueIterationAgent(env = env, theta = theta, models = brain, gamma = gamma)
+        agent = RLAgents.VI.ValueIterationAgent(env = env, brain = brain, theta = theta, models = brain, gamma = gamma)
         logfile = 'VILearn{}.log'.format(tic)
     elif agent_name == 'SARSA':
-        agent = RLAgents.SARSA.SARSAAgent(env = env, epsilon = eps_start, epsilon_decay_type = eps_type, epsilon_decay = eps_decay, epsilon_end = eps_end, lr = lr, gamma = gamma)
+        agent = RLAgents.SARSA.SARSAAgent(env = env, brain = brain, epsilon = eps_start, epsilon_decay_type = eps_type, epsilon_decay = eps_decay, epsilon_end = eps_end, lr = lr, gamma = gamma)
         logfile = 'SARSALearn{}.log'.format(tic)
     elif agent_name == 'QLEARNING':
-        agent = RLAgents.QL.QLearningAgent(env = env, epsilon = eps_start, epsilon_decay_type = eps_type, epsilon_decay = eps_decay, epsilon_end = eps_end, lr = lr, gamma = gamma)
+        agent = RLAgents.QL.QLearningAgent(env = env, brain = brain, epsilon = eps_start, epsilon_decay_type = eps_type, epsilon_decay = eps_decay, epsilon_end = eps_end, lr = lr, gamma = gamma)
         logfile = 'SARSALearn{}.log'.format(tic)
+    elif agent_name == 'DQN':
+        agent = RLAgents.DQN.DQNAgent(env = env, gamma = gamma, brain = brain, capacity = capacity, max_step = max_step,
+                                           epsilon = eps_start, epsilon_decay = eps_decay, epsilon_decay_type = eps_type, epsilon_end = eps_end,
+                                           network = networks[0], batch_size = batch_size, update = update, backend = backend)
+        logfile = 'DQNLearn{}.log'.format(tic)
     else:
         raise ValueError('The agent is not supported at this moment.')
 
