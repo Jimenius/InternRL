@@ -1,7 +1,6 @@
 import os
 from collections import deque
 import random
-import yaml
 import numpy as np
 from tensorflow.keras.models import load_model, clone_model
 from tensorflow.keras.optimizers import RMSprop, Adam

@@ -1,2 +1,2 @@
-__all__ = ['log', 'TFutils', 'Torchutils', 'utils']
+__all__ = ['log', 'TFutils', 'Torchutils', 'random', 'utils']
 from . import *

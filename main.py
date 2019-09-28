@@ -88,9 +88,13 @@ def main():
         logfile = 'SARSALearn{}.log'.format(tic)
     elif agent_name == 'DQN':
         agent = RLAgents.DQN.DQNAgent(env = env, gamma = gamma, brain = brain, capacity = capacity, max_step = max_step,
-                                           epsilon = eps_start, epsilon_decay = eps_decay, epsilon_decay_type = eps_type, epsilon_end = eps_end,
-                                           network = networks[0], batch_size = batch_size, update = update, backend = backend)
+                                      epsilon = eps_start, epsilon_decay = eps_decay, epsilon_decay_type = eps_type, epsilon_end = eps_end,
+                                      network = networks[0], batch_size = batch_size, update = update, backend = backend)
         logfile = 'DQNLearn{}.log'.format(tic)
+    elif agent_name == 'DDPG':
+        agent = RLAgents.DDPG.DDPGAgent(env = env, gamma = gamma, brain = brain, capacity = capacity, max_step = max_step,
+                                        networks = networks, batch_size = batch_size, update = update, backend = backend)
+        logfile = 'DDPGLearn{}.log'.format(tic)
     else:
         raise ValueError('The agent is not supported at this moment.')
 

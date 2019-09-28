@@ -1,5 +1,5 @@
 import yaml
-from tensorflow.keras.layers import Input, Dense, Activation, Dropout, BatchNormalization, Concatenate
+from tensorflow.keras.layers import Input, Dense, Activation, Dropout, BatchNormalization, Concatenate, Lambda
 from tensorflow.keras.models import Model
 
 def DenseLayer(x, units = 32, use_bn = True, activation = 'relu', drop_rate = 0., name = ''):
@@ -74,11 +74,13 @@ def ModelBuilder(path):
                 )
         elif ltype == 'Concatenate':
             tensors = map(lambda layer_name: layer_map[layer_name], prec)
-            x = Concatenate(tensors)
+            x = Concatenate()(list(tensors))
+        elif ltype == 'Lambda':
+            x = Lambda(eval(layer['FUNC']))(layer_map[prec[0]])
         layer_map[name] = x
         if layer['output']:
             outputs.append(x)
 
     model = Model(inputs = inputs, outputs = outputs)
-
+    model.summary()
     return model
