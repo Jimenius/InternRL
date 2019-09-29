@@ -53,7 +53,7 @@ class GeneralDQNAgent(Agent):
         try:
             if self.backend == 'TENSORFLOW':
                 self.QTargetNet = clone_model(self.QNet)
-                optimizer = TFutils.get_optimizer(name = network['OPTIMIZER'], lr = network['LEARNING_RATE'])
+                optimizer = TFutils.get_optimizer(name = network['OPTIMIZER'], learning_rate = float(network['LEARNING_RATE']))
                 self.QNet.compile(optimizer = optimizer, loss = 'mse')
         except:
             print('Test mode, fail to initialize the network otherwise')
@@ -64,13 +64,13 @@ class GeneralDQNAgent(Agent):
         x = np.array(s)
         ns = np.array(ns)
         if self.double: # Double Q-Learning
-            nQ = self.QTargetNet.predict(ns)[np.argmax(self.QNet.predict(ns), axis = -1)] * mask # Q'(s', argmax(Q(s')))
+            nQ = self.QTargetNet.predict(ns)[np.arange(self.batch_size), np.argmax(self.QNet.predict(ns), axis = -1)] * mask # Q'(s', argmax(Q(s')))
         else:
             nQ = np.amax(self.QTargetNet.predict(ns), axis = 1) * mask # max(Q(s', a'))
         y = self.QNet.predict(x)
         y[np.arange(self.batch_size), a] = self.gamma * nQ + r # Q*(s, a) = r + gamma * max(Q'(s', a'))
 
-        self.QNet.fit(x, y, self.verbose) # Train network
+        self.QNet.fit(x, y, verbose = self.verbose) # Train network
     
     def learn(self, max_epoch = 0, eval = False, logger = None, plot = False):
         '''

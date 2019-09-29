@@ -51,8 +51,8 @@ class DDPGAgent(Agent):
             if self.backend == 'TENSORFLOW':
                 self.ActorTarget = clone_model(self.Actor)
                 self.CriticTarget = clone_model(self.Critic)
-                actor_optimizer = TFutils.get_optimizer(name = networks[0]['OPTIMIZER'], lr = networks[0]['LEARNING_RATE'])
-                critic_optimizer = TFutils.get_optimizer(name = networks[1]['OPTIMIZER'], lr = networks[1]['LEARNING_RATE'])
+                actor_optimizer = TFutils.get_optimizer(name = networks[0]['OPTIMIZER'], learning_rate = float(networks[0]['LEARNING_RATE']))
+                critic_optimizer = TFutils.get_optimizer(name = networks[1]['OPTIMIZER'], learning_rate = float(networks[1]['LEARNING_RATE']))
                 self.ActorOptimizer = actor_optimizer
                 self.Critic.compile(optimizer = critic_optimizer, loss = 'mse')
                 self._init_action_train_fn()

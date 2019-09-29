@@ -86,7 +86,7 @@ def ModelBuilder(path):
     model.summary()
     return model
 
-def get_optimizer(name = 'Adam', lr = 0.001, *args, **kwargs):
+def get_optimizer(name = 'Adam', learning_rate = 0.001):
     '''
     Description:
         Get optimizer from name
@@ -108,4 +108,4 @@ def get_optimizer(name = 'Adam', lr = 0.001, *args, **kwargs):
         'adam': Adam,
         'rmsprop': RMSprop
     }
-    return optimizers[name](lr = lr, *args, **kwargs)
+    return optimizers[name](learning_rate = learning_rate)
