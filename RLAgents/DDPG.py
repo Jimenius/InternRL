@@ -19,7 +19,7 @@ class DDPGAgent(Agent):
     '''
 
     def __init__(self, optimizer = Adam, capacity = 100, learning_rate = 0.001, max_step = 0,
-                 networks = None, batch_size = 32, update = 1, backend = 'Tensorflow', **kwargs):
+                 networks = None, batch_size = 32, update = 1, backend = 'Tensorflow', verbose = verbose, **kwargs):
         # Initialize parameters
         super(DDPGAgent, self).__init__(**kwargs)
         self.memory = deque(maxlen = capacity)
@@ -35,6 +35,7 @@ class DDPGAgent(Agent):
         else:
             raise ValueError('Target update should be greater than 0. (0, 1) for soft update, [1, inf] for hard update.')
         self.backend = backend.upper()
+        self.verbose = verbose
 
         # Initialize the agent
         try:
@@ -72,7 +73,7 @@ class DDPGAgent(Agent):
         ta = self.ActorTarget.predict(ns)
         targ = self.CriticTarget.predict([ns, ta]).flatten()
         y = r + self.gamma * targ * mask
-        self.Critic.fit([x, a], y, verbose = 0) # Train network
+        self.Critic.fit([x, a], y, verbose = self.verbose) # Train network
         _ = self.ActorFn(x)
     
     def learn(self, max_epoch = 0, eval = False, logger = None, plot = False):
@@ -92,7 +93,7 @@ class DDPGAgent(Agent):
         '''
 
         process = OrnsteinUhlenbeckProcess(size=self.action_dim[0], theta=.15, mu=0., sigma=.3)
-
+        global_step = 0
         for epoch in range(max_epoch):
             state = self.reset()
             for _ in range(self.max_step):
@@ -105,14 +106,15 @@ class DDPGAgent(Agent):
                 state = next_state # Transit to the next state
                 if len(self.memory) >= self.batch_size: # Memory is large enough for training network
                     self._train_net()
-
-            if self.target_update >= 1:
-                # Target hard update
-                if (epoch + 1) % self.target_update == 0:
-                    self.ActorTarget.set_weights(self.Actor.get_weights())
-                    self.CriticTarget.set_weights(self.Critic.get_weights())
-            else:
-                pass # Placeholder for soft update
+                    global_step += 1
+                    # Update target networks
+                    if self.target_update >= 1:
+                        # Target hard update
+                        if global_step % self.target_update == 0:
+                            self.ActorTarget.set_weights(self.Actor.get_weights())
+                            self.CriticTarget.set_weights(self.Critic.get_weights())
+                        else:
+                            pass # Placeholder for soft update
 
     def load_brain(self, timestamp):
         if self.backend == 'TENSORFLOW':

@@ -57,6 +57,7 @@ def main():
     memorize = funcs['MEMORIZE']
     logdir = funcs['LOGDIR']
     plot_flag = funcs['PLOT']
+    verbose = funcs['VERBOSE']
 
     # Setup program logger
     if logdir and logdir[-1] != '/':
@@ -87,13 +88,18 @@ def main():
         agent = RLAgents.QL.QLearningAgent(env = env, brain = brain, epsilon = eps_start, epsilon_decay_type = eps_type, epsilon_decay = eps_decay, epsilon_end = eps_end, lr = lr, gamma = gamma)
         logfile = 'SARSALearn{}.log'.format(tic)
     elif agent_name == 'DQN':
-        agent = RLAgents.DQN.DQNAgent(env = env, gamma = gamma, brain = brain, capacity = capacity, max_step = max_step,
+        agent = RLAgents.DQN.GeneralDQNAgent(env = env, gamma = gamma, brain = brain, capacity = capacity, max_step = max_step, double = False,
                                       epsilon = eps_start, epsilon_decay = eps_decay, epsilon_decay_type = eps_type, epsilon_end = eps_end,
-                                      network = networks[0], batch_size = batch_size, update = update, backend = backend)
+                                      network = networks[0], batch_size = batch_size, update = update, backend = backend, verbose = verbose)
         logfile = 'DQNLearn{}.log'.format(tic)
+    elif agent_name == 'DDQN':
+        agent = RLAgents.DQN.GeneralDQNAgent(env = env, gamma = gamma, brain = brain, capacity = capacity, max_step = max_step, double = True,
+                                      epsilon = eps_start, epsilon_decay = eps_decay, epsilon_decay_type = eps_type, epsilon_end = eps_end,
+                                      network = networks[0], batch_size = batch_size, update = update, backend = backend, verbose = verbose)
+        logfile = 'DDQNLearn{}.log'.format(tic)
     elif agent_name == 'DDPG':
         agent = RLAgents.DDPG.DDPGAgent(env = env, gamma = gamma, brain = brain, capacity = capacity, max_step = max_step,
-                                        networks = networks, batch_size = batch_size, update = update, backend = backend)
+                                        networks = networks, batch_size = batch_size, update = update, backend = backend, verbose = verbose)
         logfile = 'DDPGLearn{}.log'.format(tic)
     else:
         raise ValueError('The agent is not supported at this moment.')

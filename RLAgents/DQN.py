@@ -8,7 +8,7 @@ from RLAgents.core import Agent
 from utils import TFutils, Torchutils
 from utils.utils import Epsilon_Greedy
 
-class DQNAgent(Agent):
+class GeneralDQNAgent(Agent):
     '''
     Description:
         Deep Q-Learning agent
@@ -16,16 +16,19 @@ class DQNAgent(Agent):
     Reference:
         Mnih et al, Playing Atari with Deep Reinforcement Learning
         Mnih et al, Human-level Control through Deep Reinforcement Learning
+        Hasselt et al, Deep Reinforcement Learning with Double Q-Learning
+        Wang et al, Dueling Network Architectures for Deep Reinforcement Learning
     '''
 
-    def __init__(self, optimizer = Adam, capacity = 100, learning_rate = 0.001, max_step = 0,
+    def __init__(self, optimizer = Adam, capacity = 100, learning_rate = 0.001, max_step = 0, double = False,
                  epsilon = 1., epsilon_decay_type = 'Exponential', epsilon_decay = 0.9, epsilon_end = 0.01,
-                 network = None, batch_size = 32, update = 1, backend = 'Tensorflow', **kwargs):
+                 network = None, batch_size = 32, update = 1, backend = 'Tensorflow', verbose = 1, **kwargs):
 
         # Initialize parameters
-        super(DQNAgent, self).__init__(**kwargs)
+        super(GeneralDQNAgent, self).__init__(**kwargs)
         self.memory = deque(maxlen = capacity)
         self.max_step = max_step
+        self.double = double
         self.explore_rate = epsilon
         self.explore_decay = epsilon_decay
         self.explore_decay_type = epsilon_decay_type.upper()
@@ -38,12 +41,13 @@ class DQNAgent(Agent):
         else:
             raise ValueError('Target update should be greater than 0. (0, 1) for soft update, [1, inf] for hard update.')
         self.backend = backend.upper()
-        network_path = network['PATH']
+        self.verbose = verbose
 
         # Initialize the agent
         try:
             self.load_brain(self.brain)
         except:
+            network_path = network['PATH']
             self.QNet = TFutils.ModelBuilder(network_path)
 
         self.QTargetNet = clone_model(self.QNet)
@@ -53,11 +57,15 @@ class DQNAgent(Agent):
         batch = random.sample(self.memory, self.batch_size) # Sample batch from memory
         s, a, r, ns, mask = zip(*batch) # Reorganize items
         x = np.array(s)
-        nQ = np.amax(self.QTargetNet.predict(np.array(ns)), axis = 1) * mask # max(Q(s', a'))
+        ns = np.array(ns)
+        if self.double: # Double Q-Learning
+            nQ = self.QTargetNet.predict(ns)[np.argmax(self.QNet.predict(ns), axis = -1)] * mask # Q'(s', argmax(Q(s')))
+        else:
+            nQ = np.amax(self.QTargetNet.predict(ns), axis = 1) * mask # max(Q(s', a'))
         y = self.QNet.predict(x)
         y[np.arange(self.batch_size), a] = self.gamma * nQ + r # Q*(s, a) = r + gamma * max(Q'(s', a'))
 
-        self.QNet.fit(x, y) # Train network
+        self.QNet.fit(x, y, self.verbose) # Train network
     
     def learn(self, max_epoch = 0, eval = False, logger = None, plot = False):
         '''
@@ -75,6 +83,7 @@ class DQNAgent(Agent):
             Whether to plot a figure after training
         '''
 
+        global_step = 0
         for epoch in range(max_epoch):
             state = self.reset()
             for _ in range(self.max_step):
@@ -87,6 +96,15 @@ class DQNAgent(Agent):
                 state = next_state # Transit to the next state
                 if len(self.memory) >= self.batch_size: # Memory is large enough for training network
                     self._train_net()
+                    global_step += 1
+                    # Update target network
+                    if self.target_update >= 1:
+                        # Target hard update
+                        if global_step % self.target_update == 0:
+                            self.QTargetNet.set_weights(self.QNet.get_weights())
+                        else:
+                            pass # Placeholder for soft update
+
             if self.explore_rate > self.explore_rate_min:
                 if self.explore_decay_type == 'EXPONENTIAL':
                     self.explore_rate *= self.explore_decay
@@ -94,13 +112,6 @@ class DQNAgent(Agent):
                     self.explore_rate -= self.explore_decay
                 else:
                     raise ValueError('Unsupported decay type.')
-
-            if self.target_update >= 1:
-                # Target hard update
-                if (epoch + 1) % self.target_update == 0:
-                    self.QTargetNet.set_weights(self.QNet.get_weights())
-            else:
-                pass # Placeholder for soft update
 
     def load_brain(self, timestamp):
         if self.backend == 'TENSORFLOW':
