@@ -3,7 +3,6 @@ from collections import deque
 import random
 import numpy as np
 from tensorflow.keras.models import load_model, clone_model
-from tensorflow.keras.optimizers import RMSprop, Adam
 from RLAgents.core import Agent
 from utils import TFutils, Torchutils
 from utils.utils import Epsilon_Greedy
@@ -20,7 +19,7 @@ class GeneralDQNAgent(Agent):
         Wang et al, Dueling Network Architectures for Deep Reinforcement Learning
     '''
 
-    def __init__(self, optimizer = Adam, capacity = 100, learning_rate = 0.001, max_step = 0, double = False,
+    def __init__(self, capacity = 100, max_step = 0, double = False,
                  epsilon = 1., epsilon_decay_type = 'Exponential', epsilon_decay = 0.9, epsilon_end = 0.01,
                  network = None, batch_size = 32, update = 1, backend = 'Tensorflow', verbose = 1, **kwargs):
 
@@ -48,10 +47,16 @@ class GeneralDQNAgent(Agent):
             self.load_brain(self.brain)
         except:
             network_path = network['PATH']
-            self.QNet = TFutils.ModelBuilder(network_path)
-
-        self.QTargetNet = clone_model(self.QNet)
-        self.QNet.compile(optimizer = optimizer(lr = learning_rate), loss = 'mse')
+            if self.backend == 'TENSORFLOW':
+                self.QNet = TFutils.ModelBuilder(network_path)
+        
+        try:
+            if self.backend == 'TENSORFLOW':
+                self.QTargetNet = clone_model(self.QNet)
+                optimizer = TFutils.get_optimizer(name = network['OPTIMIZER'], lr = network['LEARNING_RATE'])
+                self.QNet.compile(optimizer = optimizer, loss = 'mse')
+        except:
+            print('Test mode, fail to initialize the network otherwise')
 
     def _train_net(self):
         batch = random.sample(self.memory, self.batch_size) # Sample batch from memory

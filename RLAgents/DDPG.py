@@ -3,7 +3,6 @@ from collections import deque
 import random
 import numpy as np
 from tensorflow.keras.models import load_model, clone_model
-from tensorflow.keras.optimizers import RMSprop, Adam
 import tensorflow.keras.backend as K
 from RLAgents.core import Agent
 from utils import TFutils, Torchutils
@@ -18,8 +17,8 @@ class DDPGAgent(Agent):
         Lillicrap el al, Continuous Control with Deep Reinforcement Learning
     '''
 
-    def __init__(self, optimizer = Adam, capacity = 100, learning_rate = 0.001, max_step = 0,
-                 networks = None, batch_size = 32, update = 1, backend = 'Tensorflow', verbose = verbose, **kwargs):
+    def __init__(self, capacity = 100, max_step = 0,
+                 networks = None, batch_size = 32, update = 1, backend = 'Tensorflow', verbose = 1, **kwargs):
         # Initialize parameters
         super(DDPGAgent, self).__init__(**kwargs)
         self.memory = deque(maxlen = capacity)
@@ -44,15 +43,21 @@ class DDPGAgent(Agent):
             assert len(networks) == 2
             actor_path = networks[0]['PATH']
             critic_path = networks[1]['PATH']
-            self.Actor = TFutils.ModelBuilder(actor_path)
-            self.Critic = TFutils.ModelBuilder(critic_path)
-
-        self.ActorTarget = clone_model(self.Actor)
-        self.CriticTarget = clone_model(self.Critic)
-
-        self.Critic.compile(optimizer = optimizer(lr = learning_rate), loss = 'mse')
-        self.ActorOptimizer = optimizer(lr = learning_rate)
-        self._init_action_train_fn()
+            if self.backend == 'TENSORFLOW':
+                self.Actor = TFutils.ModelBuilder(actor_path)
+                self.Critic = TFutils.ModelBuilder(critic_path)
+        
+        try:
+            if self.backend == 'TENSORFLOW':
+                self.ActorTarget = clone_model(self.Actor)
+                self.CriticTarget = clone_model(self.Critic)
+                actor_optimizer = TFutils.get_optimizer(name = networks[0]['OPTIMIZER'], lr = networks[0]['LEARNING_RATE'])
+                critic_optimizer = TFutils.get_optimizer(name = networks[1]['OPTIMIZER'], lr = networks[1]['LEARNING_RATE'])
+                self.ActorOptimizer = actor_optimizer
+                self.Critic.compile(optimizer = critic_optimizer, loss = 'mse')
+                self._init_action_train_fn()
+        except:
+            print('Test mode, fail to initialize the network otherwise')
 
     def _init_action_train_fn(self):
         state_input = self.Actor.inputs[0]

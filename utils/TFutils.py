@@ -1,6 +1,7 @@
 import yaml
 from tensorflow.keras.layers import Input, Dense, Activation, Dropout, BatchNormalization, Concatenate, Lambda
 from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import *
 
 def DenseLayer(x, units = 32, use_bn = True, activation = 'relu', drop_rate = 0., name = ''):
     '''
@@ -84,3 +85,27 @@ def ModelBuilder(path):
     model = Model(inputs = inputs, outputs = outputs)
     model.summary()
     return model
+
+def get_optimizer(name = 'Adam', lr = 0.001, *args, **kwargs):
+    '''
+    Description:
+        Get optimizer from name
+    
+    Inputs:
+    name: str
+        Optimizer name
+    lr: float
+        Learning rate
+    
+    Outputs:
+    Optimizer
+        Keras optimizer
+    '''
+
+    name = name.lower()
+    optimizers = {
+        'sgd': SGD,
+        'adam': Adam,
+        'rmsprop': RMSprop
+    }
+    return optimizers[name](lr = lr, *args, **kwargs)
