@@ -121,6 +121,10 @@ class DDPGAgent(Agent):
                         else:
                             pass # Placeholder for soft update
 
+            # Evaluating current performance
+            if eval:
+                _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
+
     def load_brain(self, timestamp):
         if self.backend == 'TENSORFLOW':
             self.Actor = load_model('models/DDPG/Actor{}.h5'.format(timestamp))

@@ -2,6 +2,7 @@ import yaml
 from tensorflow.keras.layers import Input, Dense, Activation, Dropout, BatchNormalization, Concatenate, Lambda
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import *
+import tensorflow.keras.backend as K
 
 def DenseLayer(x, units = 32, use_bn = True, activation = 'relu', drop_rate = 0., name = ''):
     '''

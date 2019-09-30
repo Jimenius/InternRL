@@ -110,6 +110,11 @@ class GeneralDQNAgent(Agent):
                         else:
                             pass # Placeholder for soft update
 
+            # Evaluating current performance
+            if eval:
+                _ = self.render(num_episode = 1, vis = False, intv = 0, logger = logger)
+
+            # Shrink exploration rate 
             if self.explore_rate > self.explore_rate_min:
                 if self.explore_decay_type == 'EXPONENTIAL':
                     self.explore_rate *= self.explore_decay
